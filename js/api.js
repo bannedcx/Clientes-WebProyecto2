@@ -17,3 +17,29 @@ async function fetchWithTimeout(url, timeoutMs = 10000) {
         throw error;
     }
 }
+
+const MetAPI = {
+    async getDepartments() {
+        return fetchWithTimeout(`${API_BASE}/departments`);
+    },
+
+    async search(query, params = '') {
+        return fetchWithTimeout(`${API_BASE}/search?q=${query}${params}`);
+    },
+
+    async getObject(id) {
+        return fetchWithTimeout(`${API_BASE}/objects/${id}`);
+    },
+
+    async getObjectsInParallel(ids) {
+        if (!ids || ids.length === 0) return [];
+        
+        const promises = ids.map(id => this.getObject(id));
+        
+        const results = await Promise.allSettled(promises);
+        
+        return results
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value);
+    }
+};
