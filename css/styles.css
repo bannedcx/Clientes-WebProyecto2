@@ -104,3 +104,69 @@ a:hover { color: var(--accent-color); }
     padding: 3rem;
     font-family: var(--font-sans);
 }
+
+.error-container {
+    border: 1px solid #ff4a4a;
+    background-color: rgba(255, 74, 74, 0.1);
+    border-radius: 8px;
+}
+
+.btn {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background 0.3s, color 0.3s;
+}
+
+.btn:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-dark);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar h1 { margin: 0; color: var(--accent-color); }
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a.active {
+    color: var(--accent-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.footer {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem auto;
+}
+
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
+}
