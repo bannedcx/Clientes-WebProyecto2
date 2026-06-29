@@ -19,3 +19,27 @@ class MetNavbar extends HTMLElement {
 customElements.define('met-navbar', MetNavbar);
 
 class MetFooter extends HTMLElement {
+    constructor() {
+        super();
+        this.innerHTML = `
+            <footer class="footer">
+                <p>Desarrollado por Eric Vargas y Santiago Carrasquero - Clientes Web-2026</p>
+                <p><small>Datos provistos por la Open Access API del Metropolitan Museum of Art. Esta aplicación no está afiliada al museo.</small></p>
+            </footer>
+        `;
+    }
+}
+customElements.define('met-footer', MetFooter);
+
+class LoadingState extends HTMLElement {
+    constructor() {
+        super();
+        this.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Cargando información del museo...</p>
+            </div>
+        `;
+    }
+}
+customElements.define('loading-state', LoadingState);
