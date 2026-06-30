@@ -90,3 +90,44 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
     const ITEMS_PER_PAGE = 12;
     let currentSearchId = 0; 
     let currentPageRenderId = 0;
+
+    const ui = {
+        deptSelect: document.getElementById('filter-dept'),
+        qInput: document.getElementById('filter-q'),
+        sliderStart: document.getElementById('filter-year-start'),
+        sliderEnd: document.getElementById('filter-year-end'),
+        inputStart: document.getElementById('input-year-start'),
+        inputEnd: document.getElementById('input-year-end'),
+        highlight: document.getElementById('filter-highlight'),
+        images: document.getElementById('filter-images'),
+        gallery: document.getElementById('explore-gallery'),
+        btnSearch: document.getElementById('btn-search'),
+        btnReset: document.getElementById('btn-reset'),
+        btnPrev: document.getElementById('btn-prev'),
+        btnNext: document.getElementById('btn-next'),
+        pageIndicator: document.getElementById('page-indicator'),
+        paginationDiv: document.getElementById('pagination-controls')
+    };
+
+    const syncFromSlider = (e) => {
+        let valStart = parseInt(ui.sliderStart.value);
+        let valEnd = parseInt(ui.sliderEnd.value);
+        if (valStart > valEnd) {
+            if (e.target.id === 'filter-year-start') { ui.sliderStart.value = valEnd; valStart = valEnd; }
+            else { ui.sliderEnd.value = valStart; valEnd = valStart; }
+        }
+        ui.inputStart.value = valStart;
+        ui.inputEnd.value = valEnd;
+    };
+
+    const syncFromInput = () => {
+        let valStart = parseInt(ui.inputStart.value) || -4000;
+        let valEnd = parseInt(ui.inputEnd.value) || 2026;
+        
+        if (valStart < -4000) valStart = -4000;
+        if (valEnd > 2026) valEnd = 2026;
+        if (valStart > valEnd) { valStart = valEnd; ui.inputStart.value = valStart; }
+
+        ui.sliderStart.value = valStart;
+        ui.sliderEnd.value = valEnd;
+    };
