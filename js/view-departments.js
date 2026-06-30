@@ -64,3 +64,42 @@ views.renderDepartments = async (container) => {
             card.style.textAlign = 'center';
             card.style.borderTop = '4px solid var(--accent-color)';
             card.style.transition = 'background-image 0.4s ease-in-out'; 
+
+            card.onclick = () => window.location.hash = `#explore?dept=${dept.departmentId}`; 
+
+            const title = document.createElement('h3');
+            title.textContent = dept.displayName;
+            title.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+            title.style.position = 'relative';
+            title.style.zIndex = '2';
+
+            card.appendChild(title);
+            grid.appendChild(card);
+        });
+
+        deptContainer.appendChild(grid);
+
+        data.departments.forEach(async (dept) => {
+            try {
+                const queryTerm = queryMap[dept.departmentId] || 'art';
+                const searchData = await MetAPI.search(queryTerm, `&departmentId=${dept.departmentId}&hasImages=true`);
+                
+                if (searchData.objectIDs && searchData.objectIDs.length > 0) {
+                    const obraId = searchData.objectIDs[0];
+                    const obra = await MetAPI.getObject(obraId);
+                    
+                    if (obra && obra.primaryImageSmall) {
+                        const testImg = new Image();
+                        testImg.src = obra.primaryImageSmall;
+                        
+                        testImg.onload = () => {
+                            const card = document.getElementById(`dept-card-${dept.departmentId}`);
+                            if (card) {
+                                card.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.75), rgba(18, 18, 18, 0.75)), url('${obra.primaryImageSmall}')`;
+                            }
+                        };
+                    }
+                }
+            } catch (err) {
+            }
+        });
