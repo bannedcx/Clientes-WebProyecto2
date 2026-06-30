@@ -10,6 +10,7 @@ views.renderDepartments = async (container) => {
     `;
 
     const deptContainer = document.getElementById('dept-container');
+    const myNavToken = window.appNavToken;
 
     const fallbackImages = {
         1: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=400&auto=format&fit=crop', 
@@ -36,79 +37,86 @@ views.renderDepartments = async (container) => {
 
     const queryMap = {
         1: "chair", 3: "stone", 4: "sword", 5: "mask", 6: "scroll",
-        7: "cross", //
-        8: "dress", 9: "sketch", 10: "statue", 11: "canvas", 
+        7: "cross", 8: "dress", 9: "sketch", 10: "statue", 11: "canvas", 
         12: "marble", 13: "vase", 14: "tile", 15: "painting", 
         16: "book", 17: "gold", 18: "guitar", 19: "photo", 21: "abstract"
     };
 
-    try {
-        const data = await MetAPI.getDepartments();
-        deptContainer.innerHTML = '';
-        const grid = document.createElement('div');
-        grid.className = 'art-grid'; 
+    const loadDepartments = async () => {
+        try {
+            const data = await MetAPI.getDepartments();
+            if (window.appNavToken !== myNavToken) return;
 
-        data.departments.forEach(dept => {
-            const card = document.createElement('div');
-            card.className = 'art-card';
-            card.id = `dept-card-${dept.departmentId}`;
-            
-            const bgUrl = fallbackImages[dept.departmentId] || defaultFallback;
+            deptContainer.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'art-grid'; 
 
-            card.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.75), rgba(18, 18, 18, 0.75)), url('${bgUrl}')`;
-            card.style.backgroundSize = 'cover';
-            card.style.backgroundPosition = 'center';
-            card.style.justifyContent = 'center';
-            card.style.alignItems = 'center';
-            card.style.padding = '4rem 1rem';
-            card.style.textAlign = 'center';
-            card.style.borderTop = '4px solid var(--accent-color)';
-            card.style.transition = 'background-image 0.4s ease-in-out'; 
-
-            card.onclick = () => window.location.hash = `#explore?dept=${dept.departmentId}`; 
-
-            const title = document.createElement('h3');
-            title.textContent = dept.displayName;
-            title.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
-            title.style.position = 'relative';
-            title.style.zIndex = '2';
-
-            card.appendChild(title);
-            grid.appendChild(card);
-        });
-
-        deptContainer.appendChild(grid);
-
-        data.departments.forEach(async (dept) => {
-            try {
-                const queryTerm = queryMap[dept.departmentId] || 'art';
-                const searchData = await MetAPI.search(queryTerm, `&departmentId=${dept.departmentId}&hasImages=true`);
+            data.departments.forEach(dept => {
+                const card = document.createElement('div');
+                card.className = 'art-card';
+                card.id = `dept-card-${dept.departmentId}`;
                 
-                if (searchData.objectIDs && searchData.objectIDs.length > 0) {
-                    const obraId = searchData.objectIDs[0];
-                    const obra = await MetAPI.getObject(obraId);
-                    
-                    if (obra && obra.primaryImageSmall) {
-                        const testImg = new Image();
-                        testImg.src = obra.primaryImageSmall;
-                        
-                        testImg.onload = () => {
-                            const card = document.getElementById(`dept-card-${dept.departmentId}`);
-                            if (card) {
-                                card.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.75), rgba(18, 18, 18, 0.75)), url('${obra.primaryImageSmall}')`;
-                            }
-                        };
-                    }
-                }
-            } catch (err) {
-            }
-        });
+                const bgUrl = fallbackImages[dept.departmentId] || defaultFallback;
 
-    } catch (error) {
-        console.error(error);
-        deptContainer.innerHTML = '';
-        const errorElement = document.createElement('error-state');
-        errorElement.setAttribute('message', 'No pudimos cargar los departamentos.');
-        deptContainer.appendChild(errorElement);
-    }
+                card.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.75), rgba(18, 18, 18, 0.75)), url('${bgUrl}')`;
+                card.style.backgroundSize = 'cover';
+                card.style.backgroundPosition = 'center';
+                card.style.justifyContent = 'center';
+                card.style.alignItems = 'center';
+                card.style.padding = '4rem 1rem';
+                card.style.textAlign = 'center';
+                card.style.borderTop = '4px solid var(--accent-color)';
+                card.style.transition = 'background-image 0.4s ease-in-out'; 
+
+                card.onclick = () => window.location.hash = `#explore?dept=${dept.departmentId}`; 
+
+                const title = document.createElement('h3');
+                title.textContent = dept.displayName;
+                title.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+                title.style.position = 'relative';
+                title.style.zIndex = '2';
+
+                card.appendChild(title);
+                grid.appendChild(card);
+            });
+
+            deptContainer.appendChild(grid);
+
+            for (const dept of data.departments) {
+                if (window.appNavToken !== myNavToken) break;
+                try {
+                    const queryTerm = queryMap[dept.departmentId] || 'art';
+                    const searchData = await MetAPI.search(queryTerm, `&departmentId=${dept.departmentId}&hasImages=true`);
+                    
+                    if (window.appNavToken !== myNavToken) break;
+
+                    if (searchData.objectIDs && searchData.objectIDs.length > 0) {
+                        const obraId = searchData.objectIDs[0];
+                        const obra = await MetAPI.getObject(obraId);
+                        
+                        if (obra && obra.primaryImageSmall) {
+                            const testImg = new Image();
+                            testImg.src = obra.primaryImageSmall;
+                            testImg.onload = () => {
+                                const card = document.getElementById(`dept-card-${dept.departmentId}`);
+                                if (card) {
+                                    card.style.backgroundImage = `linear-gradient(rgba(18, 18, 18, 0.75), rgba(18, 18, 18, 0.75)), url('${obra.primaryImageSmall}')`;
+                                }
+                            };
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Error al cargar datos para el departamento ${dept.departmentId}:`, err);
+                }
+            }
+
+        } catch (error) {
+            if (window.appNavToken !== myNavToken) return;
+            deptContainer.innerHTML = '<error-state message="No pudimos cargar la lista de departamentos."></error-state>';
+            const errorState = deptContainer.querySelector('error-state');
+            if (errorState) errorState.addEventListener('retry', loadDepartments);
+        }
+    };
+
+    loadDepartments();
 };
