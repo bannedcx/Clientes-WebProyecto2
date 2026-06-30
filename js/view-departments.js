@@ -103,3 +103,12 @@ views.renderDepartments = async (container) => {
             } catch (err) {
             }
         });
+
+    } catch (error) {
+        console.error(error);
+        deptContainer.innerHTML = '';
+        const errorElement = document.createElement('error-state');
+        errorElement.setAttribute('message', 'No pudimos cargar los departamentos.');
+        deptContainer.appendChild(errorElement);
+    }
+};
