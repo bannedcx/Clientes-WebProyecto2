@@ -27,6 +27,20 @@ body {
     flex-direction: column;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
 main#app-container {
     flex: 1;
     padding: 2rem;
@@ -122,9 +136,18 @@ a:hover { color: var(--accent-color); }
     transition: background 0.3s, color 0.3s;
 }
 
-.btn:hover {
+.btn:hover:not(:disabled) {
     background-color: var(--text-primary);
     color: var(--bg-dark);
+}
+
+/* === ESTADO BLOQUEADO PARA LOS BOTONES (RNF-04) === */
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: var(--bg-dark);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
 }
 
 .navbar {
