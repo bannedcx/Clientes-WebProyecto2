@@ -43,3 +43,18 @@ class LoadingState extends HTMLElement {
     }
 }
 customElements.define('loading-state', LoadingState);
+
+class ErrorState extends HTMLElement {
+    constructor() {
+        super();
+        const message = this.getAttribute('message') || 'Ocurrió un error al cargar los datos de la API.';
+        this.innerHTML = `
+            <div class="error-container">
+                <h3>¡Uy! Algo salió mal</h3>
+                <p>${message}</p>
+                <button class="btn" onclick="location.reload()">Reintentar</button>
+            </div>
+        `;
+    }
+}
+customElements.define('error-state', ErrorState);
