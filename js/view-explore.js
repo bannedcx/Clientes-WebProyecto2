@@ -45,3 +45,48 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
                         <input type="range" id="filter-year-end" min="-4000" max="2026" value="2026">
                     </div>
                 </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer;">
+                        <input type="checkbox" id="filter-highlight"> Solo obras destacadas
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer;">
+                        <input type="checkbox" id="filter-images" checked> Solo con imagen
+                    </label>
+                </div>
+
+                <button id="btn-search" class="btn" style="width: 100%; margin-bottom: 0.5rem; background: var(--accent-color); color: black;">Aplicar Filtros</button>
+                <button id="btn-reset" class="btn" style="width: 100%;">Limpiar Filtros</button>
+            </aside>
+
+            <main>
+                <div id="aggregates-panel" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+                    <div><p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Total Resultados</p><h3 id="agg-total" style="margin: 0; color: var(--accent-color);">-</h3></div>
+                    <div><p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Obras Cargadas</p><h3 id="agg-loaded" style="margin: 0;">-</h3></div>
+                    <div><p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Depto Dominante</p><h4 id="agg-dept" style="margin: 0; font-size: 0.9rem;">-</h4></div>
+                    <div><p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Siglo Frecuente</p><h4 id="agg-century" style="margin: 0; font-size: 0.9rem;">-</h4></div>
+                    <div><p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Cultura Frecuente</p><h4 id="agg-culture" style="margin: 0; font-size: 0.9rem;">-</h4></div>
+                    <div style="grid-column: 1 / -1;"><small style="color: #666;">Nota: Agregados calculados sobre las obras visibles en esta página.</small></div>
+                </div>
+
+                <div id="explore-gallery"></div>
+                
+                <div id="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; display: none;">
+                    <button id="btn-prev" class="btn">⬅ Anterior</button>
+                    <span id="page-indicator">Página 1</span>
+                    <button id="btn-next" class="btn">Siguiente ➡</button>
+                </div>
+            </main>
+        </div>
+    `;
+
+    const myNavToken = window.appNavToken; 
+    let currentPage = 1;
+    let currentObjectIDs = [];
+    let totalResults = 0;
+    const ITEMS_PER_PAGE = 12;
+    let currentSearchId = 0; 
+    let currentPageRenderId = 0;
