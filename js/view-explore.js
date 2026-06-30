@@ -131,3 +131,45 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
         ui.sliderStart.value = valStart;
         ui.sliderEnd.value = valEnd;
     };
+
+    ui.sliderStart.addEventListener('input', syncFromSlider);
+    ui.sliderEnd.addEventListener('input', syncFromSlider);
+    ui.inputStart.addEventListener('change', syncFromInput);
+    ui.inputEnd.addEventListener('change', syncFromInput);
+
+    const getCentury = (yearStr) => {
+        const year = parseInt(yearStr, 10);
+        if (isNaN(year)) return null;
+        if (year < 0) return `${Math.ceil(Math.abs(year) / 100)} a.C.`;
+        return `S. ${Math.ceil(year / 100)}`;
+    };
+
+    const toggleControls = (disabled) => {
+        if (ui.btnSearch) ui.btnSearch.disabled = disabled;
+        if (ui.btnPrev) ui.btnPrev.disabled = disabled || currentPage === 1;
+        if (ui.btnNext) ui.btnNext.disabled = disabled || (currentPage * ITEMS_PER_PAGE >= totalResults);
+        if (ui.sliderStart) ui.sliderStart.disabled = disabled;
+        if (ui.sliderEnd) ui.sliderEnd.disabled = disabled;
+        if (ui.inputStart) ui.inputStart.disabled = disabled;
+        if (ui.inputEnd) ui.inputEnd.disabled = disabled;
+    };
+
+    try {
+        const deptData = await MetAPI.getDepartments();
+        if (window.appNavToken !== myNavToken) return;
+
+        if(ui.deptSelect) {
+            deptData.departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.departmentId;
+                option.textContent = dept.displayName;
+                ui.deptSelect.appendChild(option);
+            });
+            if(urlParams.get('dept')) {
+                ui.deptSelect.value = urlParams.get('dept');
+                if (ui.qInput) ui.qInput.value = ''; 
+            }
+        }
+    } catch (e) {
+        console.error('Error cargando departamentos', e);
+    }
