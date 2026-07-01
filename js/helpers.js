@@ -28,3 +28,14 @@ const views = {
         card.appendChild(info);
         return card;
     },
+
+    getMostFrequent(arr) {
+        if (arr.length === 0) return "-";
+        const counts = arr.reduce((acc, val) => {
+            if(val) acc[val] = (acc[val] || 0) + 1;
+            return acc;
+        }, {});
+        if (Object.keys(counts).length === 0) return "-";
+        return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+    }
+};
