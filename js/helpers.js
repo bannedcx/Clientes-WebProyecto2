@@ -9,3 +9,22 @@ const views = {
         img.alt = obra.title  'Obra sin título';
         img.loading = 'lazy';
         card.appendChild(img);
+
+        const info = document.createElement('div');
+        info.className = 'art-card-info';
+
+        const title = document.createElement('h3');
+        title.textContent = obra.title  'Sin título'; 
+        info.appendChild(title);
+
+        const artist = document.createElement('p');
+        artist.textContent = `Artista: ${obra.artistDisplayName  'Desconocido'}`; 
+        info.appendChild(artist);
+
+        const details = document.createElement('p');
+        details.textContent = ${obra.objectDate || 'Fecha desconocida'} • ${obra.department || 'Sin departamento'}; 
+        info.appendChild(details);
+
+        card.appendChild(info);
+        return card;
+    },
