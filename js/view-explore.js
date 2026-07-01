@@ -225,3 +225,67 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
                 data = await MetAPI.search(encodeURIComponent(query), params);
                 window.metSearchCache.set(cacheKey, data);
             }
+
+            if (searchId !== currentSearchId || window.appNavToken !== myNavToken) return;
+            if (!document.getElementById('explore-gallery')) return;
+
+            if (!data || !data.objectIDs || data.objectIDs.length === 0) {
+                // Mensaje literal exigido por la sección 4.2.1
+                galleryDiv.innerHTML = '<p style="text-align: center;">No se encontraron obras con los filtros aplicados</p>';
+                toggleControls(false);
+                return;
+            }
+
+            totalResults = data.total;
+            currentObjectIDs = data.objectIDs;
+            currentPage = 1;
+            
+            document.getElementById('agg-total').textContent = totalResults.toLocaleString();
+
+            await renderPage();
+
+        } catch (error) {
+            if (searchId !== currentSearchId || window.appNavToken !== myNavToken) return;
+            
+            galleryDiv.innerHTML = '<error-state message="La base de datos del museo rechazó la conexión tras varios intentos."></error-state>';
+            const errorState = galleryDiv.querySelector('error-state');
+            if(errorState) errorState.addEventListener('retry', fetchResults);
+            
+            toggleControls(false);
+        }
+    };
+
+    const renderPage = async () => {
+        const renderId = ++currentPageRenderId;
+        const galleryDiv = document.getElementById('explore-gallery');
+        if (!galleryDiv) return;
+
+        galleryDiv.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Descargando fichas técnicas...</p>
+            </div>
+        `;
+        if (ui.paginationDiv) ui.paginationDiv.style.display = 'none';
+        toggleControls(true);
+
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const pageIDs = currentObjectIDs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+        try {
+            const batchSize = 4; 
+            let resultadosTotales = [];
+
+            for (let i = 0; i < pageIDs.length; i += batchSize) {
+                if (renderId !== currentPageRenderId || window.appNavToken !== myNavToken) return;
+                const batch = pageIDs.slice(i, i + batchSize);
+                const promises = batch.map(id => MetAPI.getObject(id));
+                const results = await Promise.allSettled(promises);
+                resultadosTotales.push(...results);
+            }
+            
+            if (renderId !== currentPageRenderId || window.appNavToken !== myNavToken) return;
+            if (!document.getElementById('explore-gallery')) return;
+            
+            const obras = resultadosTotales.filter(res => res.status === 'fulfilled').map(res => res.value);
+            const obrasFallidas = resultadosTotales.filter(res => res.status === 'rejected').length;
