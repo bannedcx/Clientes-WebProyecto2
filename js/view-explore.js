@@ -173,3 +173,55 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
     } catch (e) {
         console.error('Error cargando departamentos', e);
     }
+
+    const fetchResults = async () => {
+        const searchId = ++currentSearchId;
+        const galleryDiv = document.getElementById('explore-gallery');
+        if (!galleryDiv) return;
+
+        ['agg-total', 'agg-loaded', 'agg-dept', 'agg-century', 'agg-culture'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '-';
+        });
+
+        const deptVal = ui.deptSelect ? ui.deptSelect.value : '';
+        const userQ = ui.qInput ? ui.qInput.value.trim() : '';
+        const hasImg = ui.images ? ui.images.checked : false;
+        const isHigh = ui.highlight ? ui.highlight.checked : false;
+        const yStart = ui.inputStart ? ui.inputStart.value : '';
+        const yEnd = ui.inputEnd ? ui.inputEnd.value : '';
+
+        galleryDiv.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Buscando en la colección (reintentando si hay lag en la red)...</p>
+            </div>
+        `;
+        if (ui.paginationDiv) ui.paginationDiv.style.display = 'none';
+        toggleControls(true);
+
+        let query = userQ;
+        if (!query) {
+            const fallbacks = { 16: "book", 8: "costume", 4: "armor", 21: "modern" };
+            query = deptVal ? (fallbacks[deptVal] || "art") : "art"; 
+        }
+
+        let params = '';
+        if (deptVal) params += `&departmentId=${deptVal}`;
+        if (hasImg) params += '&hasImages=true';
+        if (isHigh) params += '&isHighlight=true';
+        
+        if (yStart && yEnd && (yStart !== "-4000" || yEnd !== "2026")) {
+            params += `&dateBegin=${yStart}&dateEnd=${yEnd}`;
+        }
+
+        const cacheKey = query + params;
+
+        try {
+            let data;
+            if (window.metSearchCache.has(cacheKey)) {
+                data = window.metSearchCache.get(cacheKey);
+            } else {
+                data = await MetAPI.search(encodeURIComponent(query), params);
+                window.metSearchCache.set(cacheKey, data);
+            }
