@@ -289,3 +289,94 @@ views.renderExplore = async (container, urlParams = new URLSearchParams()) => {
             
             const obras = resultadosTotales.filter(res => res.status === 'fulfilled').map(res => res.value);
             const obrasFallidas = resultadosTotales.filter(res => res.status === 'rejected').length;
+
+            galleryDiv.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'art-grid';
+            grid.style.marginTop = '0';
+
+            const departamentosVisibles = [];
+            const culturasVisibles = [];
+            const siglosVisibles = [];
+
+            obras.forEach(obra => {
+                grid.appendChild(views.createArtCard(obra));
+                if(obra.department) departamentosVisibles.push(obra.department);
+                if(obra.culture) culturasVisibles.push(obra.culture);
+                
+                const century = getCentury(obra.objectEndDate || obra.objectBeginDate);
+                if (century) siglosVisibles.push(century);
+            });
+
+            if (obras.length === 0) {
+                galleryDiv.innerHTML = '<p style="text-align: center;">Las fichas de estas obras fallaron al cargar desde el servidor del museo.</p>';
+            } else {
+                galleryDiv.appendChild(grid);
+                if (obrasFallidas > 0) {
+                    const failNote = document.createElement('p');
+                    failNote.style.cssText = 'color: var(--text-secondary); font-size: 0.85rem; text-align: center; margin-top: 1rem;';
+                    failNote.textContent = `Nota: ${obrasFallidas} obra(s) omitidas por error de respuesta de la API.`;
+                    galleryDiv.appendChild(failNote);
+                }
+            }
+
+            document.getElementById('agg-loaded').textContent = obras.length;
+            document.getElementById('agg-dept').textContent = views.getMostFrequent(departamentosVisibles) || '-';
+            document.getElementById('agg-century').textContent = views.getMostFrequent(siglosVisibles) || '-';
+            document.getElementById('agg-culture').textContent = views.getMostFrequent(culturasVisibles) || '-';
+            document.getElementById('page-indicator').textContent = `Página ${currentPage} de ${Math.ceil(totalResults / ITEMS_PER_PAGE)}`;
+            
+            if (ui.paginationDiv) ui.paginationDiv.style.display = 'flex';
+            toggleControls(false);
+
+        } catch (error) {
+            if (renderId !== currentPageRenderId || window.appNavToken !== myNavToken) return;
+            
+            galleryDiv.innerHTML = '<error-state message="Error asíncrono dibujando las obras en pantalla."></error-state>';
+            const errorState = galleryDiv.querySelector('error-state');
+            if(errorState) errorState.addEventListener('retry', renderPage);
+            
+            toggleControls(false);
+        }
+    };
+
+    if (ui.btnSearch) ui.btnSearch.onclick = fetchResults;
+    
+    if (ui.btnReset) {
+        ui.btnReset.onclick = () => {
+            if (ui.qInput) ui.qInput.value = ''; 
+            if (ui.deptSelect) ui.deptSelect.value = '';
+            
+            if (ui.inputStart) ui.inputStart.value = -4000;
+            if (ui.inputEnd) ui.inputEnd.value = 2026;
+            if (ui.sliderStart) ui.sliderStart.value = -4000;
+            if (ui.sliderEnd) ui.sliderEnd.value = 2026;
+            
+            if (ui.highlight) ui.highlight.checked = false;
+            if (ui.images) ui.images.checked = false;
+            fetchResults();
+        };
+    }
+
+    if (ui.btnPrev) {
+        ui.btnPrev.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+    }
+
+    if (ui.btnNext) {
+        ui.btnNext.onclick = () => {
+            if (currentPage * ITEMS_PER_PAGE < totalResults) {
+                currentPage++;
+                renderPage();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+    }
+
+    fetchResults();
+};
