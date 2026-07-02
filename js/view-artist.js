@@ -92,3 +92,57 @@ views.renderArtist = async (container, artistName) => {
             if (errorState) errorState.addEventListener('retry', renderPage); // Botón de Reintento
         }
     };
+
+    const fetchArtistData = async () => {
+        ui.gallery.innerHTML = '<loading-state></loading-state>';
+        try {
+            let searchData = await MetAPI.search(artistName, '&artistOrCulture=true');
+            
+            if (window.appNavToken !== myNavToken) return;
+
+            if (!searchData.total || searchData.total === 0) {
+                searchData = await MetAPI.search(`"${artistName}"`, '');
+            }
+            if (!searchData.total || searchData.total === 0) {
+                searchData = await MetAPI.search(artistName, '');
+            }
+            
+            if (window.appNavToken !== myNavToken || !document.getElementById('artist-gallery')) return;
+
+            totalResults = searchData.total || 0;
+            objectIDs = searchData.objectIDs || [];
+
+            ui.statsText.textContent = `Total de obras en la colección: ${totalResults}`;
+
+            if (totalResults === 0) {
+                ui.gallery.innerHTML = '<p>No se encontraron obras para este artista en la base de datos del museo.</p>';
+                return;
+            }
+
+            await renderPage();
+
+        } catch (error) {
+            if (window.appNavToken !== myNavToken || !document.getElementById('artist-gallery')) return;
+            ui.gallery.innerHTML = '<error-state message="La conexión con la base de datos de artistas ha fallado."></error-state>';
+            const errorState = ui.gallery.querySelector('error-state');
+            if (errorState) errorState.addEventListener('retry', fetchArtistData);
+        }
+    };
+
+    fetchArtistData();
+
+    ui.btnPrev.onclick = () => {
+        if (currentPage > 1) { 
+            currentPage--; 
+            renderPage(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+    };
+    ui.btnNext.onclick = () => {
+        if (currentPage * ITEMS_PER_PAGE < totalResults) { 
+            currentPage++; 
+            renderPage(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+    };
+};
