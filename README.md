@@ -38,12 +38,17 @@ Santiago Carrasquero
 
 ## Capturas de Pantalla
 
-- Vista 01 - Pagina Principal: assets/home.png
-- Vista 02 - Explorar: assets/explore.png
-- Vista 03 - Detalle de Obra: assets/detail.png
-- Vista 04 - Departamentos: assets/departments.png
-- Vista 05 - Obras del Artista: assets/artist.png
-- Vista 06 - Comparador: assets/compare.png
+![Vista 01 - Pagina Principal](assets/home.png)
+
+![Vista 02 - Explorar](assets/explore.png)
+
+![Vista 03 - Detalle de Obra](assets/detail.png)
+
+![Vista 04 - Departamentos](assets/departments.png)
+
+![Vista 05 - Obras del Artista](assets/artist.png)
+
+![Vista 06 - Comparador](assets/compare.png)
 
 ## Decisiones Tecnicas Relevantes
 
