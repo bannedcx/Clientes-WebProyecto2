@@ -24,7 +24,7 @@ views.renderHome = async (container) => {
         galleryContainer.innerHTML = '<loading-state></loading-state>';
 
         try {
-            const [deptData, searchData] = await Promise.all([
+            const [deptData, searchData] = await Promise.allSettled([
                 MetAPI.getDepartments(),
                 MetAPI.search('*', '&isHighlight=true&hasImages=true')
             ]);
@@ -36,7 +36,7 @@ views.renderHome = async (container) => {
             const divDepts = document.createElement('div');
             const h2Depts = document.createElement('h2');
             h2Depts.style.color = 'var(--accent-color)';
-            h2Depts.textContent = deptData.departments.length;
+            h2Depts.textContent = deptData.status === 'fulfilled' ? deptData.value.departments.length : 0;
             const pDepts = document.createElement('p');
             pDepts.textContent = 'Departamentos';
             divDepts.appendChild(h2Depts);
@@ -45,7 +45,7 @@ views.renderHome = async (container) => {
             const divWorks = document.createElement('div');
             const h2Works = document.createElement('h2');
             h2Works.style.color = 'var(--accent-color)';
-            h2Works.textContent = searchData.total.toLocaleString();
+            h2Works.textContent = searchData.status === 'fulfilled' ? searchData.value.total.toLocaleString() : 0;
             const pWorks = document.createElement('p');
             pWorks.textContent = 'Obras Destacadas';
             divWorks.appendChild(h2Works);
@@ -54,8 +54,8 @@ views.renderHome = async (container) => {
             statsContainer.appendChild(divDepts);
             statsContainer.appendChild(divWorks);
 
-            if (searchData.objectIDs && searchData.objectIDs.length > 0) {
-                const top12IDs = searchData.objectIDs.slice(0, 12);
+            if (searchData.status === 'fulfilled' && searchData.value.objectIDs && searchData.value.objectIDs.length > 0) {
+                const top12IDs = searchData.value.objectIDs.slice(0, 12);
                 let resultadosTotales = [];
                 const batchSize = 4;
 
