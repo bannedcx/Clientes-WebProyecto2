@@ -1,4 +1,4 @@
-Views.renderHome = async (container) => {
+views.renderHome = async (container) => {
     container.innerHTML = `
         <section class="hero" style="text-align: center; margin-bottom: 3rem; padding: 2rem 0; border-bottom: 1px solid var(--border-color);">
             <h1>Explora la colección del Met</h1>
@@ -24,16 +24,12 @@ Views.renderHome = async (container) => {
         galleryContainer.innerHTML = '<loading-state></loading-state>';
 
         try {
-            
-            const [deptResult, searchResult] = await Promise.allSettled([
+            const [deptData, searchData] = await Promise.all([
                 MetAPI.getDepartments(),
                 MetAPI.search('*', '&isHighlight=true&hasImages=true')
             ]);
 
             if (window.appNavToken !== myNavToken) return;
-
-            const deptData = deptResult.status === 'fulfilled' ? deptResult.value : { departments: [] };
-            const searchData = searchResult.status === 'fulfilled' ? searchResult.value : { total: 0, objectIDs: [] };
 
             statsContainer.innerHTML = ''; 
 
