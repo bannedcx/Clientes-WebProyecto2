@@ -2,11 +2,11 @@ const views = {
     createArtCard(obra) {
         const card = document.createElement('div');
         card.className = 'art-card';
-        card.onclick = () => window.location.hash = #detail/${obra.objectID};
+        card.onclick = () => window.location.hash = `#detail/${obra.objectID}`;
 
         const img = document.createElement('img');
-        img.src = obra.primaryImageSmall  'https://via.placeholder.com/300x250/222222/d4af37?text=Sin+Imagen'; 
-        img.alt = obra.title  'Obra sin título';
+        img.src = obra.primaryImageSmall || 'https://via.placeholder.com/300x250/222222/d4af37?text=Sin+Imagen'; 
+        img.alt = obra.title || 'Obra sin título';
         img.loading = 'lazy';
         card.appendChild(img);
 
@@ -14,15 +14,15 @@ const views = {
         info.className = 'art-card-info';
 
         const title = document.createElement('h3');
-        title.textContent = obra.title  'Sin título'; 
+        title.textContent = obra.title || 'Sin título'; 
         info.appendChild(title);
 
         const artist = document.createElement('p');
-        artist.textContent = `Artista: ${obra.artistDisplayName  'Desconocido'}`; 
+        artist.textContent = `Artista: ${obra.artistDisplayName || 'Desconocido'}`; 
         info.appendChild(artist);
 
         const details = document.createElement('p');
-        details.textContent = ${obra.objectDate || 'Fecha desconocida'} • ${obra.department || 'Sin departamento'}; 
+        details.textContent = `${obra.objectDate || 'Fecha desconocida'} • ${obra.department || 'Sin departamento'}`; 
         info.appendChild(details);
 
         card.appendChild(info);
