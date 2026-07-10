@@ -16,7 +16,7 @@ views.renderDetail = async (container, id) => {
             
             const backBtn = document.createElement('button');
             backBtn.className = 'btn';
-            backBtn.textContent = '⬅️ Volver';
+            backBtn.textContent = '⬅ Volver';
             backBtn.onclick = () => window.history.back(); 
             container.appendChild(backBtn);
 
@@ -132,7 +132,7 @@ views.renderDetail = async (container, id) => {
                 linkMuseum.className = 'btn';
                 linkMuseum.href = obra.objectURL;
                 linkMuseum.target = '_blank';
-                linkMuseum.textContent = 'Ver en museo original ↗️';
+                linkMuseum.textContent = 'Ver en museo original ↗';
                 linkMuseum.style.cssText = 'background: transparent; border-color: var(--accent-color); color: var(--accent-color); text-decoration: none; display: flex; align-items: center; justify-content: center; padding: 0.5rem 1rem;';
                 actionsContainer.appendChild(linkMuseum);
             }
