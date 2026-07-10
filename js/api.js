@@ -44,7 +44,8 @@ const MetAPI = {
     },
 
     async search(query, params = '') {
-        return this.searchWithRetry(`${this.baseUrl}/search?q=${query}${params}`);
+        const encodedQuery = encodeURIComponent(query);
+        return this.searchWithRetry(`${this.baseUrl}/search?q=${encodedQuery}${params}`);
     },
 
     async getObject(id) {
